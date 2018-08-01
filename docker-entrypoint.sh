@@ -54,7 +54,7 @@ setup_autoregister_properties_file() {
 
 AGENT_WORK_DIR="/go"
 
-sh -c "$(which dind) dockerd --host=unix:///var/run/docker.sock --host=tcp://0.0.0.0:2375 --storage-driver=vfs" > /usr/local/bin/nohup.out 2>&1 &# no arguments are passed so assume user wants to run the gocd server
+sh -c "$(which dind) dockerd --host=unix:///var/run/docker.sock --host=tcp://0.0.0.0:2375" > /usr/local/bin/nohup.out 2>&1 &# no arguments are passed so assume user wants to run the gocd server
 # we prepend "/go-agent/agent.sh" to the argument list
 if [[ $# -eq 0 ]] ; then
   set -- /go-agent/agent.sh "$@"
