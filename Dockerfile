@@ -1,4 +1,4 @@
-# Copyright 2017 ThoughtWorks, Inc.
+# Copyright 2018 ThoughtWorks, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,11 +20,11 @@
 FROM docker:dind
 MAINTAINER GoCD <go-cd-dev@googlegroups.com>
 
-LABEL gocd.version="18.7.0" \
+LABEL gocd.version="18.8.0" \
   description="GoCD agent based on docker version dind" \
   maintainer="GoCD <go-cd-dev@googlegroups.com>" \
-  gocd.full.version="18.7.0-7121" \
-  gocd.git.sha="75d1247f58ab8bcde3c5b43392a87347979f82c5"
+  gocd.full.version="18.8.0-7433" \
+  gocd.git.sha="4bf750d09bf4dba76a2b7ce0d72e88ecdfdbd96a"
 
 ADD https://github.com/krallin/tini/releases/download/v0.18.0/tini-static-amd64 /usr/local/sbin/tini
 ADD https://github.com/tianon/gosu/releases/download/1.10/gosu-amd64 /usr/local/sbin/gosu
@@ -50,17 +50,15 @@ RUN \
   apk --no-cache upgrade && \
   apk add --no-cache openjdk8-jre-base git mercurial subversion openssh-client bash curl && \
 # download the zip file
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/18.7.0-7121/generic/go-agent-18.7.0-7121.zip" > /tmp/go-agent.zip && \
+  curl --fail --location --silent --show-error "https://download.gocd.org/experimental/binaries/18.8.0-7433/generic/go-agent-18.8.0-7433.zip" > /tmp/go-agent.zip && \
 # unzip the zip file into /go-agent, after stripping the first path prefix
   unzip /tmp/go-agent.zip -d / && \
-  mv go-agent-18.7.0 /go-agent && \
+  mv go-agent-18.8.0 /go-agent && \
   rm /tmp/go-agent.zip && \
   mkdir -p /docker-entrypoint.d
 
 # ensure that logs are printed to console output
-COPY agent-bootstrapper-logback-include.xml /go-agent/config/agent-bootstrapper-logback-include.xml
-COPY agent-launcher-logback-include.xml /go-agent/config/agent-launcher-logback-include.xml
-COPY agent-logback-include.xml /go-agent/config/agent-logback-include.xml
+COPY agent-bootstrapper-logback-include.xml agent-launcher-logback-include.xml agent-logback-include.xml /go-agent/config/
 
 ADD docker-entrypoint.sh /
 
