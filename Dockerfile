@@ -20,11 +20,11 @@
 FROM docker:dind
 MAINTAINER GoCD <go-cd-dev@googlegroups.com>
 
-LABEL gocd.version="18.8.0" \
+LABEL gocd.version="18.9.0" \
   description="GoCD agent based on docker version dind" \
   maintainer="GoCD <go-cd-dev@googlegroups.com>" \
-  gocd.full.version="18.8.0-7433" \
-  gocd.git.sha="4bf750d09bf4dba76a2b7ce0d72e88ecdfdbd96a"
+  gocd.full.version="18.9.0-7478" \
+  gocd.git.sha="f202ea9416939d7ce356cf3939239ef953ec423b"
 
 ADD https://github.com/krallin/tini/releases/download/v0.18.0/tini-static-amd64 /usr/local/sbin/tini
 ADD https://github.com/tianon/gosu/releases/download/1.10/gosu-amd64 /usr/local/sbin/gosu
@@ -50,10 +50,10 @@ RUN \
   apk --no-cache upgrade && \
   apk add --no-cache openjdk8-jre-base git mercurial subversion openssh-client bash curl && \
 # download the zip file
-  curl --fail --location --silent --show-error "https://download.gocd.org/experimental/binaries/18.8.0-7433/generic/go-agent-18.8.0-7433.zip" > /tmp/go-agent.zip && \
+  curl --fail --location --silent --show-error "https://download.gocd.org/experimental/binaries/18.9.0-7478/generic/go-agent-18.9.0-7478.zip" > /tmp/go-agent.zip && \
 # unzip the zip file into /go-agent, after stripping the first path prefix
   unzip /tmp/go-agent.zip -d / && \
-  mv go-agent-18.8.0 /go-agent && \
+  mv go-agent-18.9.0 /go-agent && \
   rm /tmp/go-agent.zip && \
   mkdir -p /docker-entrypoint.d
 
