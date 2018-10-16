@@ -16,7 +16,7 @@ Please checkout the changes made every release to the agent images at https://gi
 Start the container with this:
 
 ```
-docker run -d -e GO_SERVER_URL=... gocd/gocd-agent-docker-dind:v18.10.0
+docker run --privileged -d -e GO_SERVER_URL=... gocd/gocd-agent-docker-dind:v18.10.0
 ```
 
 **Note:** Please make sure to *always* provide the version. We do not publish the `latest` tag. And we don't intend to.
