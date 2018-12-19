@@ -16,7 +16,7 @@ Please checkout the changes made every release to the agent images at https://gi
 Start the container with this:
 
 ```
-docker run --privileged -d -e GO_SERVER_URL=... gocd/gocd-agent-docker-dind:v18.11.0
+docker run --privileged -d -e GO_SERVER_URL=... gocd/gocd-agent-docker-dind:v18.12.0
 ```
 
 **Note:** Please make sure to *always* provide the version. We do not publish the `latest` tag. And we don't intend to.
@@ -30,14 +30,14 @@ This will start the GoCD agent and connect it the GoCD server specified by `GO_S
 If you have a [gocd-server container](https://hub.docker.com/r/gocd/gocd-server/) running and it's named `angry_feynman`, you can connect a gocd-agent container to it by doing:
 
 ```
-docker run --privileged -d -e GO_SERVER_URL=https://$(docker inspect --format='{{(index (index .NetworkSettings.IPAddress))}}' angry_feynman):8154/go gocd/gocd-agent-docker-dind:v18.11.0
+docker run --privileged -d -e GO_SERVER_URL=https://$(docker inspect --format='{{(index (index .NetworkSettings.IPAddress))}}' angry_feynman):8154/go gocd/gocd-agent-docker-dind:v18.12.0
 ```
 OR
 
 If the docker container running the gocd server has ports mapped to the host,
 
 ```
-docker run --privileged -d -e GO_SERVER_URL=https://<ip_of_host_machine>:$(docker inspect --format='{{(index (index .NetworkSettings.Ports "8154/tcp") 0).HostPort}}' angry_feynman)/go gocd/gocd-agent-docker-dind:v18.11.0
+docker run --privileged -d -e GO_SERVER_URL=https://<ip_of_host_machine>:$(docker inspect --format='{{(index (index .NetworkSettings.Ports "8154/tcp") 0).HostPort}}' angry_feynman)/go gocd/gocd-agent-docker-dind:v18.12.0
 ```
 
 # Available configuration options
@@ -50,21 +50,18 @@ docker run --privileged -d \
         -e AGENT_AUTO_REGISTER_RESOURCES=... \
         -e AGENT_AUTO_REGISTER_ENVIRONMENTS=... \
         -e AGENT_AUTO_REGISTER_HOSTNAME=... \
-        gocd/gocd-agent-docker-dind:v18.11.0
+        gocd/gocd-agent-docker-dind:v18.12.0
 ```
 
 If the `AGENT_AUTO_REGISTER_*` variables are provided (we recommend that you do), then the agent will be automatically approved by the server. See the [auto registration docs](https://docs.gocd.io/current/advanced_usage/agent_auto_register.html) on the GoCD website.
 
-## Usage with docker and swarm elastic agent plugins
-
-This image will work well with the [docker elastic agent plugin](https://github.com/gocd-contrib/docker-elastic-agents) and the [docker swarm elastic agent plugin](https://github.com/gocd-contrib/docker-swarm-elastic-agents). No special configuration would be needed.
 
 ## Mounting volumes
 
 The GoCD agent will store all configuration, logs and perform builds in `/godata`. If you'd like to provide secure credentials like SSH private keys among other things, you can mount `/home/go`.
 
 ```
-docker run --privileged -v /path/to/godata:/godata -v /path/to/home-dir:/home/go gocd/gocd-agent-docker-dind:v18.11.0
+docker run --privileged -v /path/to/godata:/godata -v /path/to/home-dir:/home/go gocd/gocd-agent-docker-dind:v18.12.0
 ```
 
 > **Note:** Ensure that `/path/to/home-dir` and `/path/to/godata` is accessible by the `go` user in container (`go` user - uid 1000).
@@ -74,7 +71,7 @@ docker run --privileged -v /path/to/godata:/godata -v /path/to/home-dir:/home/go
 JVM options can be tweaked using the environment variable `GO_AGENT_SYSTEM_PROPERTIES`.
 
 ```
-docker run --privileged -e GO_AGENT_SYSTEM_PROPERTIES="-Dfoo=bar" gocd/gocd-agent-docker-dind:v18.11.0
+docker run --privileged -e GO_AGENT_SYSTEM_PROPERTIES="-Dfoo=bar" gocd/gocd-agent-docker-dind:v18.12.0
 ```
 
 # Under the hood
@@ -88,13 +85,7 @@ The GoCD server runs as the `go` user, the location of the various directories i
 | `/godata/logs`      | the directory where GoCD logs will be written out to                             |
 | `/home/go`          | the home directory for the GoCD server                                           |
 
-## Running docker and docker-compose in your jobs
 
-To be able to run the `docker` and `docker-compose` commands inside your jobs, you will need to share the docker socket as a volume from your host which is pretty classic.
-
-In this case, as the docker deamon will be the one mounting the volumes you define, the path to the files you will want to mount (basically inside `/godata/pipelines`) need to be the same so that the docker deamon (which is running on the host) can find the files.
-
-If you run several agents container, you will need to overwrite the `VOLUME_DIR` environment variable to have a different path for your `/godata` for each of your gocd agent containers (to avoid issues). For example, if the volume on your host for the first container is `/go-agent1/godata`, you will set the `VOLUME_DIR` environment data on your container to `/go-agent1/godata` and the `docker-entrypoint.sh` script will automatically manage it and make sure the agent stores its configuration, logs and pipelines there.
 
 # Troubleshooting
 
