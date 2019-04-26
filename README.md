@@ -16,7 +16,7 @@ Please checkout the changes made every release to the agent images at https://gi
 Start the container with this:
 
 ```
-docker run --privileged -d -e GO_SERVER_URL=... gocd/gocd-agent-docker-dind:v19.2.0
+docker run --privileged -d -e GO_SERVER_URL=... gocd/gocd-agent-docker-dind:v19.3.0
 ```
 
 **Note:** Please make sure to *always* provide the version. We do not publish the `latest` tag. And we don't intend to.
@@ -30,14 +30,14 @@ This will start the GoCD agent and connect it the GoCD server specified by `GO_S
 If you have a [gocd-server container](https://hub.docker.com/r/gocd/gocd-server/) running and it's named `angry_feynman`, you can connect a gocd-agent container to it by doing:
 
 ```
-docker run --privileged -d -e GO_SERVER_URL=https://$(docker inspect --format='{{(index (index .NetworkSettings.IPAddress))}}' angry_feynman):8154/go gocd/gocd-agent-docker-dind:v19.2.0
+docker run --privileged -d -e GO_SERVER_URL=https://$(docker inspect --format='{{(index (index .NetworkSettings.IPAddress))}}' angry_feynman):8154/go gocd/gocd-agent-docker-dind:v19.3.0
 ```
 OR
 
 If the docker container running the gocd server has ports mapped to the host,
 
 ```
-docker run --privileged -d -e GO_SERVER_URL=https://<ip_of_host_machine>:$(docker inspect --format='{{(index (index .NetworkSettings.Ports "8154/tcp") 0).HostPort}}' angry_feynman)/go gocd/gocd-agent-docker-dind:v19.2.0
+docker run --privileged -d -e GO_SERVER_URL=https://<ip_of_host_machine>:$(docker inspect --format='{{(index (index .NetworkSettings.Ports "8154/tcp") 0).HostPort}}' angry_feynman)/go gocd/gocd-agent-docker-dind:v19.3.0
 ```
 
 # Available configuration options
@@ -50,18 +50,17 @@ docker run --privileged -d \
         -e AGENT_AUTO_REGISTER_RESOURCES=... \
         -e AGENT_AUTO_REGISTER_ENVIRONMENTS=... \
         -e AGENT_AUTO_REGISTER_HOSTNAME=... \
-        gocd/gocd-agent-docker-dind:v19.2.0
+        gocd/gocd-agent-docker-dind:v19.3.0
 ```
 
 If the `AGENT_AUTO_REGISTER_*` variables are provided (we recommend that you do), then the agent will be automatically approved by the server. See the [auto registration docs](https://docs.gocd.io/current/advanced_usage/agent_auto_register.html) on the GoCD website.
-
 
 ## Mounting volumes
 
 The GoCD agent will store all configuration, logs and perform builds in `/godata`. If you'd like to provide secure credentials like SSH private keys among other things, you can mount `/home/go`.
 
 ```
-docker run --privileged -v /path/to/godata:/godata -v /path/to/home-dir:/home/go gocd/gocd-agent-docker-dind:v19.2.0
+docker run --privileged -v /path/to/godata:/godata -v /path/to/home-dir:/home/go gocd/gocd-agent-docker-dind:v19.3.0
 ```
 
 > **Note:** Ensure that `/path/to/home-dir` and `/path/to/godata` is accessible by the `go` user in container (`go` user - uid 1000).
@@ -71,7 +70,7 @@ docker run --privileged -v /path/to/godata:/godata -v /path/to/home-dir:/home/go
 JVM options can be tweaked using the environment variable `GO_AGENT_SYSTEM_PROPERTIES`.
 
 ```
-docker run --privileged -e GO_AGENT_SYSTEM_PROPERTIES="-Dfoo=bar" gocd/gocd-agent-docker-dind:v19.2.0
+docker run --privileged -e GO_AGENT_SYSTEM_PROPERTIES="-Dfoo=bar" gocd/gocd-agent-docker-dind:v19.3.0
 ```
 
 # Under the hood
@@ -84,7 +83,6 @@ The GoCD server runs as the `go` user, the location of the various directories i
 | `/godata/pipelines` | the directory where the agent will run builds                                    |
 | `/godata/logs`      | the directory where GoCD logs will be written out to                             |
 | `/home/go`          | the home directory for the GoCD server                                           |
-
 
 
 # Troubleshooting
@@ -100,11 +98,10 @@ The GoCD server runs as the `go` user, the location of the various directories i
 * Anyone using our docker agent image as the base image for your customized image, and writing to `/home/go` as part of your Dockerfile, these changes in `/home/go` don't persist while you start the container with your custom image.
  A fix has been applied [here](https://github.com/gocd/docker-gocd-agent/commit/27b8772) and will be available for subsequent releases of the docker images.
 
-
 # License
 
 ```plain
-Copyright 2018 ThoughtWorks, Inc.
+Copyright 2019 ThoughtWorks, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

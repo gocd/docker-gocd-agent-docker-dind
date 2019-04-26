@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2018 ThoughtWorks, Inc.
+# Copyright 2019 ThoughtWorks, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -54,7 +54,11 @@ setup_autoregister_properties_file() {
 
 AGENT_WORK_DIR="/go"
 
-sh -c "$(which dind) dockerd --host=unix:///var/run/docker.sock --host=tcp://0.0.0.0:2375" > /usr/local/bin/nohup.out 2>&1 &# no arguments are passed so assume user wants to run the gocd server
+if [ -e /run-docker-daemon.sh ]; then
+  /run-docker-daemon.sh
+fi
+
+# no arguments are passed so assume user wants to run the gocd server
 # we prepend "/go-agent/agent.sh" to the argument list
 if [[ $# -eq 0 ]] ; then
   set -- /go-agent/agent.sh "$@"
