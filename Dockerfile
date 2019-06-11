@@ -21,20 +21,20 @@ FROM alpine:latest as gocd-agent-unzip
 RUN \
   apk --no-cache upgrade && \
   apk add --no-cache curl && \
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/19.4.0-9155/generic/go-agent-19.4.0-9155.zip" > /tmp/go-agent-19.4.0-9155.zip
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/19.5.0-9272/generic/go-agent-19.5.0-9272.zip" > /tmp/go-agent-19.5.0-9272.zip
 
-RUN unzip /tmp/go-agent-19.4.0-9155.zip -d /
-RUN mv /go-agent-19.4.0 /go-agent
+RUN unzip /tmp/go-agent-19.5.0-9272.zip -d /
+RUN mv /go-agent-19.5.0 /go-agent
 
 FROM docker:dind
 MAINTAINER ThoughtWorks, Inc. <support@thoughtworks.com>
 
-LABEL gocd.version="19.4.0" \
+LABEL gocd.version="19.5.0" \
   description="GoCD agent based on docker version dind" \
   maintainer="ThoughtWorks, Inc. <support@thoughtworks.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="19.4.0-9155" \
-  gocd.git.sha="0f01ab091e85a0d735b8b580eee5f83245fba2e5"
+  gocd.full.version="19.5.0-9272" \
+  gocd.git.sha="496bf8b95e603c1f3980ae59042bc559eecbbbc0"
 
 ADD https://github.com/krallin/tini/releases/download/v0.18.0/tini-static-amd64 /usr/local/sbin/tini
 ADD https://github.com/tianon/gosu/releases/download/1.11/gosu-amd64 /usr/local/sbin/gosu
