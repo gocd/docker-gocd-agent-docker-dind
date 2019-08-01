@@ -21,20 +21,20 @@ FROM alpine:latest as gocd-agent-unzip
 RUN \
   apk --no-cache upgrade && \
   apk add --no-cache curl && \
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/19.6.0-9515/generic/go-agent-19.6.0-9515.zip" > /tmp/go-agent-19.6.0-9515.zip
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/19.7.0-9567/generic/go-agent-19.7.0-9567.zip" > /tmp/go-agent-19.7.0-9567.zip
 
-RUN unzip /tmp/go-agent-19.6.0-9515.zip -d /
-RUN mv /go-agent-19.6.0 /go-agent
+RUN unzip /tmp/go-agent-19.7.0-9567.zip -d /
+RUN mv /go-agent-19.7.0 /go-agent
 
 FROM docker:dind
 MAINTAINER ThoughtWorks, Inc. <support@thoughtworks.com>
 
-LABEL gocd.version="19.6.0" \
+LABEL gocd.version="19.7.0" \
   description="GoCD agent based on docker version dind" \
   maintainer="ThoughtWorks, Inc. <support@thoughtworks.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="19.6.0-9515" \
-  gocd.git.sha="4b674c10941b6c27d7ec2a28dd946518d9211b7a"
+  gocd.full.version="19.7.0-9567" \
+  gocd.git.sha="727ea9db824eb6971170ac2a886ff1072ff5a235"
 
 ADD https://github.com/krallin/tini/releases/download/v0.18.0/tini-static-amd64 /usr/local/sbin/tini
 
@@ -55,7 +55,7 @@ RUN \
 # regardless of whatever dependencies get added
 # add user to root group for gocd to work on openshift
   adduser -D -u ${UID} -s /bin/bash -G root go && \
-    apk add --no-cache cyrus-sasl cyrus-sasl-plain && \
+    apk add --no-cache cyrus-sasl cyrus-sasl-plain sudo && \
   apk --no-cache upgrade && \
   apk add --no-cache nss git mercurial subversion openssh-client bash curl procps && \
   # install glibc and zlib for adoptopenjdk && \
@@ -104,11 +104,12 @@ ADD docker-entrypoint.sh /
 COPY --from=gocd-agent-unzip /go-agent /go-agent
 # ensure that logs are printed to console output
 COPY --chown=go:root agent-bootstrapper-logback-include.xml agent-launcher-logback-include.xml agent-logback-include.xml /go-agent/config/
+COPY --chown=root:root dockerd-sudo /etc/sudoers.d/dockerd-sudo
 
 RUN chown -R go:root /go-agent /docker-entrypoint.d /go /godata /docker-entrypoint.sh \
     && chmod -R g=u /go-agent /docker-entrypoint.d /go /godata /docker-entrypoint.sh
 
-  ADD run-docker-daemon.sh /
+  COPY --chown=root:root run-docker-daemon.sh /
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
