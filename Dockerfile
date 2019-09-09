@@ -18,23 +18,26 @@
 ###############################################################################################
 
 FROM alpine:latest as gocd-agent-unzip
+
+ARG UID=1000
+
 RUN \
   apk --no-cache upgrade && \
   apk add --no-cache curl && \
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/19.7.0-9567/generic/go-agent-19.7.0-9567.zip" > /tmp/go-agent-19.7.0-9567.zip
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/19.8.0-9915/generic/go-agent-19.8.0-9915.zip" > /tmp/go-agent-19.8.0-9915.zip
 
-RUN unzip /tmp/go-agent-19.7.0-9567.zip -d /
-RUN mv /go-agent-19.7.0 /go-agent
+RUN unzip /tmp/go-agent-19.8.0-9915.zip -d /
+RUN mv /go-agent-19.8.0 /go-agent && chown -R ${UID}:0 /go-agent && chmod -R g=u /go-agent
 
 FROM docker:dind
 MAINTAINER ThoughtWorks, Inc. <support@thoughtworks.com>
 
-LABEL gocd.version="19.7.0" \
+LABEL gocd.version="19.8.0" \
   description="GoCD agent based on docker version dind" \
   maintainer="ThoughtWorks, Inc. <support@thoughtworks.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="19.7.0-9567" \
-  gocd.git.sha="727ea9db824eb6971170ac2a886ff1072ff5a235"
+  gocd.full.version="19.8.0-9915" \
+  gocd.git.sha="9ea99a72c338a132ae1ca83f363e16b2c95d920b"
 
 ADD https://github.com/krallin/tini/releases/download/v0.18.0/tini-static-amd64 /usr/local/sbin/tini
 
@@ -106,8 +109,8 @@ COPY --from=gocd-agent-unzip /go-agent /go-agent
 COPY --chown=go:root agent-bootstrapper-logback-include.xml agent-launcher-logback-include.xml agent-logback-include.xml /go-agent/config/
 COPY --chown=root:root dockerd-sudo /etc/sudoers.d/dockerd-sudo
 
-RUN chown -R go:root /go-agent /docker-entrypoint.d /go /godata /docker-entrypoint.sh \
-    && chmod -R g=u /go-agent /docker-entrypoint.d /go /godata /docker-entrypoint.sh
+RUN chown -R go:root /docker-entrypoint.d /go /godata /docker-entrypoint.sh \
+    && chmod -R g=u /docker-entrypoint.d /go /godata /docker-entrypoint.sh
 
   COPY --chown=root:root run-docker-daemon.sh /
 
