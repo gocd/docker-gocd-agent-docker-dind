@@ -1,6 +1,6 @@
 # GoCD Agent Docker image
 
-[GoCD agent](https://www.gocd.io) docker image based on docker dind.
+[GoCD agent](https://www.gocd.io) docker image based on docker dind with kubectl and rancher command line tools.
 
 
 # Issues, feedback?
