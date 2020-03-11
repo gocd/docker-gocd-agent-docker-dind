@@ -130,6 +130,14 @@ if [ "$1" = "${AGENT_WORK_DIR}/bin/go-agent" ]; then
   echo "wrapper.app.parameter.100=-serverUrl" > /go-agent/wrapper-config/wrapper-properties.conf
   echo "wrapper.app.parameter.101=${GO_SERVER_URL}" >> /go-agent/wrapper-config/wrapper-properties.conf
 
+  # setup healthcheck check api
+  if [ -n "$AGENT_HEALTH_STATUS_HOST" ]; then
+    echo "go.agent.status.api.bind.host=${AGENT_HEALTH_STATUS_HOST}" >> /go-agent/wrapper-config/wrapper-properties.conf
+  fi
+  if [ -n "$AGENT_HEALTH_STATUS_PORT" ]; then
+    echo "go.agent.status.api.bind.port=${AGENT_HEALTH_STATUS_PORT}" >> /go-agent/wrapper-config/wrapper-properties.conf
+  fi
+
   # parse/split an environment var to an array like how it should pass to the CLI
   # AGENT_BOOTSTRAPPER_JVM_ARGS is mostly for advanced users.
   eval stringToArgsArray "$AGENT_BOOTSTRAPPER_JVM_ARGS"
