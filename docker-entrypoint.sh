@@ -130,7 +130,7 @@ if [ "$1" = "${AGENT_WORK_DIR}/bin/go-agent" ]; then
   echo "wrapper.app.parameter.100=-serverUrl" > /go-agent/wrapper-config/wrapper-properties.conf
   echo "wrapper.app.parameter.101=${GO_SERVER_URL}" >> /go-agent/wrapper-config/wrapper-properties.conf
 
-  # setup healthcheck check api
+  # setup health check api
   if [ -n "$AGENT_HEALTH_STATUS_HOST" ]; then
     echo "go.agent.status.api.bind.host=${AGENT_HEALTH_STATUS_HOST}" >> /go-agent/wrapper-config/wrapper-properties.conf
   fi
