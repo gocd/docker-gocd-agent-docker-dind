@@ -24,20 +24,20 @@ ARG UID=1000
 RUN \
   apk --no-cache upgrade && \
   apk add --no-cache curl && \
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/20.1.0-11114/generic/go-agent-20.1.0-11114.zip" > /tmp/go-agent-20.1.0-11114.zip
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/20.2.0-11344/generic/go-agent-20.2.0-11344.zip" > /tmp/go-agent-20.2.0-11344.zip
 
-RUN unzip /tmp/go-agent-20.1.0-11114.zip -d /
-RUN mv /go-agent-20.1.0 /go-agent && chown -R ${UID}:0 /go-agent && chmod -R g=u /go-agent
+RUN unzip /tmp/go-agent-20.2.0-11344.zip -d /
+RUN mv /go-agent-20.2.0 /go-agent && chown -R ${UID}:0 /go-agent && chmod -R g=u /go-agent
 
 FROM docker:dind
 MAINTAINER ThoughtWorks, Inc. <support@thoughtworks.com>
 
-LABEL gocd.version="20.1.0" \
+LABEL gocd.version="20.2.0" \
   description="GoCD agent based on docker version dind" \
   maintainer="ThoughtWorks, Inc. <support@thoughtworks.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="20.1.0-11114" \
-  gocd.git.sha="f2c1771e333ea92dae82cd78d2efa1310c1086f0"
+  gocd.full.version="20.2.0-11344" \
+  gocd.git.sha="0cb6660ad91a19a4064e6537374c896506add24a"
 
 ADD https://github.com/krallin/tini/releases/download/v0.18.0/tini-static-amd64 /usr/local/sbin/tini
 
@@ -95,7 +95,7 @@ RUN \
     apk del --purge .build-deps glibc-i18n && \
     rm -rf /tmp/*.apk /tmp/gcc /tmp/gcc-libs.tar.xz /tmp/libz /tmp/libz.tar.xz /var/cache/apk/* && \
   # end installing adoptopenjre  && \
-  curl --fail --location --silent --show-error 'https://github.com/AdoptOpenJDK/openjdk13-binaries/releases/download/jdk-13.0.1%2B9/OpenJDK13U-jre_x64_linux_hotspot_13.0.1_9.tar.gz' --output /tmp/jre.tar.gz && \
+  curl --fail --location --silent --show-error 'https://github.com/AdoptOpenJDK/openjdk13-binaries/releases/download/jdk-13.0.2%2B8/OpenJDK13U-jre_x64_linux_hotspot_13.0.2_8.tar.gz' --output /tmp/jre.tar.gz && \
   mkdir -p /gocd-jre && \
   tar -xf /tmp/jre.tar.gz -C /gocd-jre --strip 1 && \
   rm -rf /tmp/jre.tar.gz && \
