@@ -24,20 +24,20 @@ ARG UID=1000
 RUN \
   apk --no-cache upgrade && \
   apk add --no-cache curl && \
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/20.2.0-11344/generic/go-agent-20.2.0-11344.zip" > /tmp/go-agent-20.2.0-11344.zip
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/20.3.0-11530/generic/go-agent-20.3.0-11530.zip" > /tmp/go-agent-20.3.0-11530.zip
 
-RUN unzip /tmp/go-agent-20.2.0-11344.zip -d /
-RUN mv /go-agent-20.2.0 /go-agent && chown -R ${UID}:0 /go-agent && chmod -R g=u /go-agent
+RUN unzip /tmp/go-agent-20.3.0-11530.zip -d /
+RUN mv /go-agent-20.3.0 /go-agent && chown -R ${UID}:0 /go-agent && chmod -R g=u /go-agent
 
 FROM docker:dind
 MAINTAINER ThoughtWorks, Inc. <support@thoughtworks.com>
 
-LABEL gocd.version="20.2.0" \
+LABEL gocd.version="20.3.0" \
   description="GoCD agent based on docker version dind" \
   maintainer="ThoughtWorks, Inc. <support@thoughtworks.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="20.2.0-11344" \
-  gocd.git.sha="0cb6660ad91a19a4064e6537374c896506add24a"
+  gocd.full.version="20.3.0-11530" \
+  gocd.git.sha="f54d0bae7a39fe7add5460f3f8676a7936abf698"
 
 ADD https://github.com/krallin/tini/releases/download/v0.18.0/tini-static-amd64 /usr/local/sbin/tini
 
