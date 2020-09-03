@@ -54,7 +54,7 @@ setup_autoregister_properties_file() {
 }
 
 if [ -e /run-docker-daemon.sh ]; then
-  sudo /run-docker-daemon.sh
+  sudo -E /run-docker-daemon.sh
 fi
 
 AGENT_WORK_DIR="/go"
