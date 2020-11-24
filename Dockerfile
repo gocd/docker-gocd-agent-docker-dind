@@ -24,19 +24,19 @@ ARG UID=1000
 RUN \
   apk --no-cache upgrade && \
   apk add --no-cache curl && \
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/20.9.0-12335/generic/go-agent-20.9.0-12335.zip" > /tmp/go-agent-20.9.0-12335.zip
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/20.10.0-12356/generic/go-agent-20.10.0-12356.zip" > /tmp/go-agent-20.10.0-12356.zip
 
-RUN unzip /tmp/go-agent-20.9.0-12335.zip -d /
-RUN mv /go-agent-20.9.0 /go-agent && chown -R ${UID}:0 /go-agent && chmod -R g=u /go-agent
+RUN unzip /tmp/go-agent-20.10.0-12356.zip -d /
+RUN mv /go-agent-20.10.0 /go-agent && chown -R ${UID}:0 /go-agent && chmod -R g=u /go-agent
 
 FROM docker:dind
 
-LABEL gocd.version="20.9.0" \
+LABEL gocd.version="20.10.0" \
   description="GoCD agent based on docker version dind" \
   maintainer="ThoughtWorks, Inc. <support@thoughtworks.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="20.9.0-12335" \
-  gocd.git.sha="cccb4960bde1166ccd79277093295ed5a18573ed"
+  gocd.full.version="20.10.0-12356" \
+  gocd.git.sha="b16b6bc3f7ad3bb39e465ff2168d1cc66c95b4d5"
 
 ADD https://github.com/krallin/tini/releases/download/v0.18.0/tini-static-amd64 /usr/local/sbin/tini
 
@@ -92,7 +92,7 @@ RUN \
     apk del --purge .build-deps glibc-i18n && \
     rm -rf /tmp/*.apk /tmp/gcc /tmp/gcc-libs.tar.xz /tmp/libz /tmp/libz.tar.xz /var/cache/apk/* && \
   # end installing adoptopenjre  && \
-  curl --fail --location --silent --show-error 'https://github.com/AdoptOpenJDK/openjdk15-binaries/releases/download/jdk-15%2B36/OpenJDK15U-jre_x64_linux_hotspot_15_36.tar.gz' --output /tmp/jre.tar.gz && \
+  curl --fail --location --silent --show-error 'https://github.com/AdoptOpenJDK/openjdk15-binaries/releases/download/jdk-15.0.1%2B9/OpenJDK15U-jre_x64_linux_hotspot_15.0.1_9.tar.gz' --output /tmp/jre.tar.gz && \
   mkdir -p /gocd-jre && \
   tar -xf /tmp/jre.tar.gz -C /gocd-jre --strip 1 && \
   rm -rf /tmp/jre.tar.gz && \
