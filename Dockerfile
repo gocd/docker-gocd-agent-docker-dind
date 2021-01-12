@@ -1,4 +1,4 @@
-# Copyright 2020 ThoughtWorks, Inc.
+# Copyright 2021 ThoughtWorks, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,19 +24,19 @@ ARG UID=1000
 RUN \
   apk --no-cache upgrade && \
   apk add --no-cache curl && \
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/20.10.0-12356/generic/go-agent-20.10.0-12356.zip" > /tmp/go-agent-20.10.0-12356.zip
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/21.1.0-12439/generic/go-agent-21.1.0-12439.zip" > /tmp/go-agent-21.1.0-12439.zip
 
-RUN unzip /tmp/go-agent-20.10.0-12356.zip -d /
-RUN mv /go-agent-20.10.0 /go-agent && chown -R ${UID}:0 /go-agent && chmod -R g=u /go-agent
+RUN unzip /tmp/go-agent-21.1.0-12439.zip -d /
+RUN mv /go-agent-21.1.0 /go-agent && chown -R ${UID}:0 /go-agent && chmod -R g=u /go-agent
 
 FROM docker:dind
 
-LABEL gocd.version="20.10.0" \
+LABEL gocd.version="21.1.0" \
   description="GoCD agent based on docker version dind" \
   maintainer="ThoughtWorks, Inc. <support@thoughtworks.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="20.10.0-12356" \
-  gocd.git.sha="b16b6bc3f7ad3bb39e465ff2168d1cc66c95b4d5"
+  gocd.full.version="21.1.0-12439" \
+  gocd.git.sha="5a4959c7c4ede49165ec961b0219126cd5aa9e52"
 
 ADD https://github.com/krallin/tini/releases/download/v0.18.0/tini-static-amd64 /usr/local/sbin/tini
 
