@@ -24,19 +24,19 @@ ARG UID=1000
 RUN \
   apk --no-cache upgrade && \
   apk add --no-cache curl && \
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/21.1.0-12439/generic/go-agent-21.1.0-12439.zip" > /tmp/go-agent-21.1.0-12439.zip
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/21.2.0-12498/generic/go-agent-21.2.0-12498.zip" > /tmp/go-agent-21.2.0-12498.zip
 
-RUN unzip /tmp/go-agent-21.1.0-12439.zip -d /
-RUN mv /go-agent-21.1.0 /go-agent && chown -R ${UID}:0 /go-agent && chmod -R g=u /go-agent
+RUN unzip /tmp/go-agent-21.2.0-12498.zip -d /
+RUN mv /go-agent-21.2.0 /go-agent && chown -R ${UID}:0 /go-agent && chmod -R g=u /go-agent
 
 FROM docker:dind
 
-LABEL gocd.version="21.1.0" \
+LABEL gocd.version="21.2.0" \
   description="GoCD agent based on docker version dind" \
   maintainer="ThoughtWorks, Inc. <support@thoughtworks.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="21.1.0-12439" \
-  gocd.git.sha="5a4959c7c4ede49165ec961b0219126cd5aa9e52"
+  gocd.full.version="21.2.0-12498" \
+  gocd.git.sha="16e1ac6956cd5177a99dc3fe33503661881c354f"
 
 ADD https://github.com/krallin/tini/releases/download/v0.18.0/tini-static-amd64 /usr/local/sbin/tini
 
@@ -55,7 +55,7 @@ RUN \
 # regardless of whatever dependencies get added
 # add user to root group for gocd to work on openshift
   adduser -D -u ${UID} -s /bin/bash -G root go && \
-    apk add --no-cache cyrus-sasl cyrus-sasl-plain sudo && \
+    apk add --no-cache libsasl sudo && \
   apk --no-cache upgrade && \
   apk add --no-cache nss git mercurial subversion openssh-client bash curl procps && \
   # install glibc and zlib for adoptopenjdk && \
@@ -92,7 +92,7 @@ RUN \
     apk del --purge .build-deps glibc-i18n && \
     rm -rf /tmp/*.apk /tmp/gcc /tmp/gcc-libs.tar.xz /tmp/libz /tmp/libz.tar.xz /var/cache/apk/* && \
   # end installing adoptopenjre  && \
-  curl --fail --location --silent --show-error 'https://github.com/AdoptOpenJDK/openjdk15-binaries/releases/download/jdk-15.0.1%2B9/OpenJDK15U-jre_x64_linux_hotspot_15.0.1_9.tar.gz' --output /tmp/jre.tar.gz && \
+  curl --fail --location --silent --show-error 'https://github.com/AdoptOpenJDK/openjdk15-binaries/releases/download/jdk-15.0.2%2B7/OpenJDK15U-jre_x64_linux_hotspot_15.0.2_7.tar.gz' --output /tmp/jre.tar.gz && \
   mkdir -p /gocd-jre && \
   tar -xf /tmp/jre.tar.gz -C /gocd-jre --strip 1 && \
   rm -rf /tmp/jre.tar.gz && \
