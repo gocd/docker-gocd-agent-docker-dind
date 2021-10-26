@@ -24,19 +24,19 @@ ARG UID=1000
 RUN \
   apk --no-cache upgrade && \
   apk add --no-cache curl && \
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/21.2.0-12498/generic/go-agent-21.2.0-12498.zip" > /tmp/go-agent-21.2.0-12498.zip
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/21.3.0-13067/generic/go-agent-21.3.0-13067.zip" > /tmp/go-agent-21.3.0-13067.zip
 
-RUN unzip /tmp/go-agent-21.2.0-12498.zip -d /
-RUN mv /go-agent-21.2.0 /go-agent && chown -R ${UID}:0 /go-agent && chmod -R g=u /go-agent
+RUN unzip /tmp/go-agent-21.3.0-13067.zip -d /
+RUN mv /go-agent-21.3.0 /go-agent && chown -R ${UID}:0 /go-agent && chmod -R g=u /go-agent
 
 FROM docker:dind
 
-LABEL gocd.version="21.2.0" \
+LABEL gocd.version="21.3.0" \
   description="GoCD agent based on docker version dind" \
   maintainer="ThoughtWorks, Inc. <support@thoughtworks.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="21.2.0-12498" \
-  gocd.git.sha="16e1ac6956cd5177a99dc3fe33503661881c354f"
+  gocd.full.version="21.3.0-13067" \
+  gocd.git.sha="4c4bb4780eb0d3fc4cacfc4cfcc0b07e2eaf0595"
 
 ADD https://github.com/krallin/tini/releases/download/v0.18.0/tini-static-amd64 /usr/local/sbin/tini
 
@@ -56,6 +56,7 @@ RUN \
 # add user to root group for gocd to work on openshift
   adduser -D -u ${UID} -s /bin/bash -G root go && \
     apk add --no-cache libsasl sudo && \
+    apk del --purge libc6-compat && \
   apk --no-cache upgrade && \
   apk add --no-cache nss git mercurial subversion openssh-client bash curl procps && \
   # install glibc and zlib for adoptopenjdk && \
