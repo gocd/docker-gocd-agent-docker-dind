@@ -17,28 +17,23 @@
 # Please file any issues or PRs at https://github.com/gocd/gocd
 ###############################################################################################
 
-FROM alpine:latest as gocd-agent-unzip
-
+FROM curlimages/curl:latest as gocd-agent-unzip
+USER root
 ARG UID=1000
+RUN curl --fail --location --silent --show-error "https://download.gocd.org/binaries/21.4.0-13469/generic/go-agent-21.4.0-13469.zip" > /tmp/go-agent-21.4.0-13469.zip
+RUN unzip /tmp/go-agent-21.4.0-13469.zip -d /
+RUN mv /go-agent-21.4.0 /go-agent && chown -R ${UID}:0 /go-agent && chmod -R g=u /go-agent
 
-RUN \
-  apk --no-cache upgrade && \
-  apk add --no-cache curl && \
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/21.3.0-13067/generic/go-agent-21.3.0-13067.zip" > /tmp/go-agent-21.3.0-13067.zip
+FROM docker.io/docker:dind
 
-RUN unzip /tmp/go-agent-21.3.0-13067.zip -d /
-RUN mv /go-agent-21.3.0 /go-agent && chown -R ${UID}:0 /go-agent && chmod -R g=u /go-agent
-
-FROM docker:dind
-
-LABEL gocd.version="21.3.0" \
-  description="GoCD agent based on docker version dind" \
+LABEL gocd.version="21.4.0" \
+  description="GoCD agent based on docker.io/docker:dind" \
   maintainer="ThoughtWorks, Inc. <support@thoughtworks.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="21.3.0-13067" \
-  gocd.git.sha="4c4bb4780eb0d3fc4cacfc4cfcc0b07e2eaf0595"
+  gocd.full.version="21.4.0-13469" \
+  gocd.git.sha="f3b865c5018dec2bddf98496e0e74e8e70a80cb6"
 
-ADD https://github.com/krallin/tini/releases/download/v0.18.0/tini-static-amd64 /usr/local/sbin/tini
+ADD https://github.com/krallin/tini/releases/download/v0.19.0/tini-static-amd64 /usr/local/sbin/tini
 
 # force encoding
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
