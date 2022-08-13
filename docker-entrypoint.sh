@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2022 ThoughtWorks, Inc.
+# Copyright 2022 Thoughtworks, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ function stringToArgsArray() {
 
 setup_autoregister_properties_file_for_elastic_agent() {
  {
+    echo "# Auto-registration properties in key=value format, encoded in UTF-8"
     echo "agent.auto.register.key=${GO_EA_AUTO_REGISTER_KEY}"
     echo "agent.auto.register.environments=${GO_EA_AUTO_REGISTER_ENVIRONMENT}"
     echo "agent.auto.register.elasticAgent.agentId=${GO_EA_AUTO_REGISTER_ELASTIC_AGENT_ID}"
@@ -38,6 +39,7 @@ setup_autoregister_properties_file_for_elastic_agent() {
 
 setup_autoregister_properties_file_for_normal_agent() {
   {
+    echo "# Auto-registration properties in key=value format, encoded in UTF-8"
     echo "agent.auto.register.key=${AGENT_AUTO_REGISTER_KEY}"
     echo "agent.auto.register.resources=${AGENT_AUTO_REGISTER_RESOURCES}"
     echo "agent.auto.register.environments=${AGENT_AUTO_REGISTER_ENVIRONMENTS}"
@@ -61,7 +63,7 @@ fi
 
 AGENT_WORK_DIR="/go"
 
-# no arguments are passed so assume user wants to run the gocd agent
+# no arguments are passed so assume user wants to run the GoCD agent
 # we prepend "/${AGENT_WORK_DIR}/bin/go-agent console" to the argument list
 if [[ $# -eq 0 ]] ; then
   set -- "${AGENT_WORK_DIR}/bin/go-agent" console "$@"
@@ -124,7 +126,7 @@ if [ "$1" = "${AGENT_WORK_DIR}/bin/go-agent" ]; then
 
   # setup the java binary and wrapper log
   try sed -i \
-    -e "s@wrapper.logfile=.*@/wrapper.logfile=${AGENT_WORK_DIR}/logs/go-agent-bootstrapper-wrapper.log@g" \
+    -e "s@wrapper.logfile=.*@wrapper.logfile=${AGENT_WORK_DIR}/logs/go-agent-bootstrapper-wrapper.log@g" \
     -e "s@wrapper.java.command=.*@wrapper.java.command=${GO_JAVA_HOME}/bin/java@g" \
     -e "s@wrapper.working.dir=.*@wrapper.working.dir=${AGENT_WORK_DIR}@g" \
     /go-agent/wrapper-config/wrapper.conf

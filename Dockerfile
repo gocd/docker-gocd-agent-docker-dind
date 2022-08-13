@@ -1,4 +1,4 @@
-# Copyright 2022 ThoughtWorks, Inc.
+# Copyright 2022 Thoughtworks, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,18 +20,18 @@
 FROM curlimages/curl:latest as gocd-agent-unzip
 USER root
 ARG UID=1000
-RUN curl --fail --location --silent --show-error "https://download.gocd.org/binaries/22.1.0-13913/generic/go-agent-22.1.0-13913.zip" > /tmp/go-agent-22.1.0-13913.zip
-RUN unzip /tmp/go-agent-22.1.0-13913.zip -d /
-RUN mv /go-agent-22.1.0 /go-agent && chown -R ${UID}:0 /go-agent && chmod -R g=u /go-agent
+RUN curl --fail --location --silent --show-error "https://download.gocd.org/binaries/22.2.0-14697/generic/go-agent-22.2.0-14697.zip" > /tmp/go-agent-22.2.0-14697.zip
+RUN unzip /tmp/go-agent-22.2.0-14697.zip -d /
+RUN mv /go-agent-22.2.0 /go-agent && chown -R ${UID}:0 /go-agent && chmod -R g=u /go-agent
 
 FROM docker.io/docker:dind
 
-LABEL gocd.version="22.1.0" \
+LABEL gocd.version="22.2.0" \
   description="GoCD agent based on docker.io/docker:dind" \
-  maintainer="ThoughtWorks, Inc. <support@thoughtworks.com>" \
+  maintainer="GoCD Team <go-cd-dev@googlegroups.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="22.1.0-13913" \
-  gocd.git.sha="f4c9c1650e2e27fe0a9962faa39536f94f57e297"
+  gocd.full.version="22.2.0-14697" \
+  gocd.git.sha="4bdda4e0d769e66da651926c7066979740bd7ae7"
 
 ADD https://github.com/krallin/tini/releases/download/v0.19.0/tini-static-amd64 /usr/local/sbin/tini
 
@@ -48,12 +48,12 @@ RUN \
   chown root:root /usr/local/sbin/tini && \
 # add our user and group first to make sure their IDs get assigned consistently,
 # regardless of whatever dependencies get added
-# add user to root group for gocd to work on openshift
+# add user to root group for GoCD to work on openshift
   adduser -D -u ${UID} -s /bin/bash -G root go && \
-    apk add --no-cache libsasl sudo && \
-    apk del --purge libc6-compat && \
   apk --no-cache upgrade && \
   apk add --no-cache nss git mercurial subversion openssh-client bash curl procps && \
+  apk add --no-cache sudo && \
+  apk del --purge libc6-compat && \
   # install glibc and zlib for adoptopenjdk && \
   # See https://github.com/AdoptOpenJDK/openjdk-docker/blob/ce8b120411b131e283106ab89ea5921ebb1d1759/8/jdk/alpine/Dockerfile.hotspot.releases.slim#L24-L54 && \
     apk add --no-cache --virtual .build-deps binutils && \
@@ -88,7 +88,7 @@ RUN \
     apk del --purge .build-deps glibc-i18n && \
     rm -rf /tmp/*.apk /tmp/gcc /tmp/gcc-libs.tar.xz /tmp/libz /tmp/libz.tar.xz /var/cache/apk/* && \
   # end installing adoptopenjre  && \
-  curl --fail --location --silent --show-error 'https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.2%2B8/OpenJDK17U-jre_x64_linux_hotspot_17.0.2_8.tar.gz' --output /tmp/jre.tar.gz && \
+  curl --fail --location --silent --show-error 'https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.4%2B8/OpenJDK17U-jre_x64_linux_hotspot_17.0.4_8.tar.gz' --output /tmp/jre.tar.gz && \
   mkdir -p /gocd-jre && \
   tar -xf /tmp/jre.tar.gz -C /gocd-jre --strip 1 && \
   rm -rf /tmp/jre.tar.gz && \
