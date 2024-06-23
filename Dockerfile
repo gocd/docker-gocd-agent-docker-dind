@@ -17,35 +17,35 @@
 # Please file any issues or PRs at https://github.com/gocd/gocd
 ###############################################################################################
 
-FROM curlimages/curl:latest as gocd-agent-unzip
+FROM curlimages/curl:latest AS gocd-agent-unzip
 USER root
 ARG TARGETARCH
 ARG UID=1000
-RUN curl --fail --location --silent --show-error "https://download.gocd.org/binaries/24.1.0-18867/generic/go-agent-24.1.0-18867.zip" > /tmp/go-agent-24.1.0-18867.zip && \
-    unzip -q /tmp/go-agent-24.1.0-18867.zip -d / && \
+RUN curl --fail --location --silent --show-error "https://download.gocd.org/binaries/24.2.0-19076/generic/go-agent-24.2.0-19076.zip" > /tmp/go-agent-24.2.0-19076.zip && \
+    unzip -q /tmp/go-agent-24.2.0-19076.zip -d / && \
     mkdir -p /go-agent/wrapper /go-agent/bin && \
-    mv -v /go-agent-24.1.0/LICENSE /go-agent/LICENSE && \
-    mv -v /go-agent-24.1.0/*.md /go-agent && \
-    mv -v /go-agent-24.1.0/bin/go-agent /go-agent/bin/go-agent && \
-    mv -v /go-agent-24.1.0/lib /go-agent/lib && \
-    mv -v /go-agent-24.1.0/logs /go-agent/logs && \
-    mv -v /go-agent-24.1.0/run /go-agent/run && \
-    mv -v /go-agent-24.1.0/wrapper-config /go-agent/wrapper-config && \
+    mv -v /go-agent-24.2.0/LICENSE /go-agent/LICENSE && \
+    mv -v /go-agent-24.2.0/*.md /go-agent && \
+    mv -v /go-agent-24.2.0/bin/go-agent /go-agent/bin/go-agent && \
+    mv -v /go-agent-24.2.0/lib /go-agent/lib && \
+    mv -v /go-agent-24.2.0/logs /go-agent/logs && \
+    mv -v /go-agent-24.2.0/run /go-agent/run && \
+    mv -v /go-agent-24.2.0/wrapper-config /go-agent/wrapper-config && \
     WRAPPERARCH=$(if [ $TARGETARCH == amd64 ]; then echo x86-64; elif [ $TARGETARCH == arm64 ]; then echo arm-64; else echo $TARGETARCH is unknown!; exit 1; fi) && \
-    mv -v /go-agent-24.1.0/wrapper/wrapper-linux-$WRAPPERARCH* /go-agent/wrapper/ && \
-    mv -v /go-agent-24.1.0/wrapper/libwrapper-linux-$WRAPPERARCH* /go-agent/wrapper/ && \
-    mv -v /go-agent-24.1.0/wrapper/wrapper.jar /go-agent/wrapper/ && \
+    mv -v /go-agent-24.2.0/wrapper/wrapper-linux-$WRAPPERARCH* /go-agent/wrapper/ && \
+    mv -v /go-agent-24.2.0/wrapper/libwrapper-linux-$WRAPPERARCH* /go-agent/wrapper/ && \
+    mv -v /go-agent-24.2.0/wrapper/wrapper.jar /go-agent/wrapper/ && \
     chown -R ${UID}:0 /go-agent && chmod -R g=u /go-agent
 
 FROM docker.io/docker:dind
 ARG TARGETARCH
 
-LABEL gocd.version="24.1.0" \
+LABEL gocd.version="24.2.0" \
   description="GoCD agent based on docker.io/docker:dind" \
   maintainer="GoCD Team <go-cd-dev@googlegroups.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="24.1.0-18867" \
-  gocd.git.sha="a60529cdf34a96de310bc05e2041f2ac23014707"
+  gocd.full.version="24.2.0-19076" \
+  gocd.git.sha="1406870fc6e121194028e55c4facc0c638d70007"
 
 ADD https://github.com/krallin/tini/releases/download/v0.19.0/tini-static-${TARGETARCH} /usr/local/sbin/tini
 
@@ -63,6 +63,7 @@ RUN \
   apk --no-cache upgrade && \
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
   adduser -D -u ${UID} -s /bin/bash -G root go && \
+  adduser go docker && \
   apk add --no-cache git openssh-client bash curl procps && \
   apk add --no-cache sudo && \
   # install glibc/zlib for the Tanuki Wrapper, and use by glibc-linked Adoptium JREs && \
@@ -91,7 +92,7 @@ RUN \
     apk del --purge .build-deps glibc-i18n && \
     rm -rf /tmp/*.apk /tmp/libz /tmp/libz.tar* /var/cache/apk/* && \
   # end installing glibc/zlib && \
-  curl --fail --location --silent --show-error "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.11%2B9/OpenJDK17U-jre_$(uname -m | sed -e s/86_//g)_linux_hotspot_17.0.11_9.tar.gz" --output /tmp/jre.tar.gz && \
+  curl --fail --location --silent --show-error "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.3%2B9/OpenJDK21U-jre_$(uname -m | sed -e s/86_//g)_linux_hotspot_21.0.3_9.tar.gz" --output /tmp/jre.tar.gz && \
   mkdir -p /gocd-jre && \
   tar -xf /tmp/jre.tar.gz -C /gocd-jre --strip 1 && \
   rm -rf /tmp/jre.tar.gz && \
