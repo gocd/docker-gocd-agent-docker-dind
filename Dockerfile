@@ -17,35 +17,34 @@
 # Please file any issues or PRs at https://github.com/gocd/gocd
 ###############################################################################################
 
-FROM curlimages/curl:latest AS gocd-agent-unzip
-USER root
+FROM cgr.dev/chainguard/bash:latest AS gocd-agent-unzip
 ARG TARGETARCH
 ARG UID=1000
-RUN curl --fail --location --silent --show-error "https://download.gocd.org/binaries/24.4.0-19686/generic/go-agent-24.4.0-19686.zip" > /tmp/go-agent-24.4.0-19686.zip && \
-    unzip -q /tmp/go-agent-24.4.0-19686.zip -d / && \
+RUN curl --fail --location --silent --show-error "https://download.gocd.org/binaries/24.5.0-19913/generic/go-agent-24.5.0-19913.zip" > /tmp/go-agent-24.5.0-19913.zip && \
+    unzip -q /tmp/go-agent-24.5.0-19913.zip -d / && \
     mkdir -p /go-agent/wrapper /go-agent/bin && \
-    mv -v /go-agent-24.4.0/LICENSE /go-agent/LICENSE && \
-    mv -v /go-agent-24.4.0/*.md /go-agent && \
-    mv -v /go-agent-24.4.0/bin/go-agent /go-agent/bin/go-agent && \
-    mv -v /go-agent-24.4.0/lib /go-agent/lib && \
-    mv -v /go-agent-24.4.0/logs /go-agent/logs && \
-    mv -v /go-agent-24.4.0/run /go-agent/run && \
-    mv -v /go-agent-24.4.0/wrapper-config /go-agent/wrapper-config && \
+    mv -v /go-agent-24.5.0/LICENSE /go-agent/LICENSE && \
+    mv -v /go-agent-24.5.0/*.md /go-agent && \
+    mv -v /go-agent-24.5.0/bin/go-agent /go-agent/bin/go-agent && \
+    mv -v /go-agent-24.5.0/lib /go-agent/lib && \
+    mv -v /go-agent-24.5.0/logs /go-agent/logs && \
+    mv -v /go-agent-24.5.0/run /go-agent/run && \
+    mv -v /go-agent-24.5.0/wrapper-config /go-agent/wrapper-config && \
     WRAPPERARCH=$(if [ $TARGETARCH == amd64 ]; then echo x86-64; elif [ $TARGETARCH == arm64 ]; then echo arm-64; else echo $TARGETARCH is unknown!; exit 1; fi) && \
-    mv -v /go-agent-24.4.0/wrapper/wrapper-linux-$WRAPPERARCH* /go-agent/wrapper/ && \
-    mv -v /go-agent-24.4.0/wrapper/libwrapper-linux-$WRAPPERARCH* /go-agent/wrapper/ && \
-    mv -v /go-agent-24.4.0/wrapper/wrapper.jar /go-agent/wrapper/ && \
+    mv -v /go-agent-24.5.0/wrapper/wrapper-linux-$WRAPPERARCH* /go-agent/wrapper/ && \
+    mv -v /go-agent-24.5.0/wrapper/libwrapper-linux-$WRAPPERARCH* /go-agent/wrapper/ && \
+    mv -v /go-agent-24.5.0/wrapper/wrapper.jar /go-agent/wrapper/ && \
     chown -R ${UID}:0 /go-agent && chmod -R g=u /go-agent
 
 FROM docker.io/docker:dind
 ARG TARGETARCH
 
-LABEL gocd.version="24.4.0" \
+LABEL gocd.version="24.5.0" \
   description="GoCD agent based on docker.io/docker:dind" \
   maintainer="GoCD Team <go-cd-dev@googlegroups.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="24.4.0-19686" \
-  gocd.git.sha="4e34832acbaf77d46bca61ccc4b0f8d458831a31"
+  gocd.full.version="24.5.0-19913" \
+  gocd.git.sha="8f7bf5297c90c909e42d030baad54a1d32701c65"
 
 ADD https://github.com/krallin/tini/releases/download/v0.19.0/tini-static-${TARGETARCH} /usr/local/sbin/tini
 
