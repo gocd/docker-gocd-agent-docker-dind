@@ -20,41 +20,42 @@
 FROM cgr.dev/chainguard/bash:latest AS gocd-agent-unzip
 ARG TARGETARCH
 ARG UID=1000
-RUN curl --fail --location --silent --show-error "https://download.gocd.org/binaries/25.1.0-20129/generic/go-agent-25.1.0-20129.zip" > /tmp/go-agent-25.1.0-20129.zip && \
-    unzip -q /tmp/go-agent-25.1.0-20129.zip -d / && \
+RUN curl --fail --location --silent --show-error "https://download.gocd.org/binaries/25.2.0-20485/generic/go-agent-25.2.0-20485.zip" > /tmp/go-agent-25.2.0-20485.zip && \
+    unzip -q /tmp/go-agent-25.2.0-20485.zip -d / && \
     mkdir -p /go-agent/wrapper /go-agent/bin && \
-    mv -v /go-agent-25.1.0/LICENSE /go-agent/LICENSE && \
-    mv -v /go-agent-25.1.0/*.md /go-agent && \
-    mv -v /go-agent-25.1.0/bin/go-agent /go-agent/bin/go-agent && \
-    mv -v /go-agent-25.1.0/lib /go-agent/lib && \
-    mv -v /go-agent-25.1.0/logs /go-agent/logs && \
-    mv -v /go-agent-25.1.0/run /go-agent/run && \
-    mv -v /go-agent-25.1.0/wrapper-config /go-agent/wrapper-config && \
+    mv -v /go-agent-25.2.0/LICENSE /go-agent/LICENSE && \
+    mv -v /go-agent-25.2.0/*.md /go-agent && \
+    mv -v /go-agent-25.2.0/bin/go-agent /go-agent/bin/go-agent && \
+    mv -v /go-agent-25.2.0/lib /go-agent/lib && \
+    mv -v /go-agent-25.2.0/logs /go-agent/logs && \
+    mv -v /go-agent-25.2.0/run /go-agent/run && \
+    mv -v /go-agent-25.2.0/wrapper-config /go-agent/wrapper-config && \
     WRAPPERARCH=$(if [ $TARGETARCH == amd64 ]; then echo x86-64; elif [ $TARGETARCH == arm64 ]; then echo arm-64; else echo $TARGETARCH is unknown!; exit 1; fi) && \
-    mv -v /go-agent-25.1.0/wrapper/wrapper-linux-$WRAPPERARCH* /go-agent/wrapper/ && \
-    mv -v /go-agent-25.1.0/wrapper/libwrapper-linux-$WRAPPERARCH* /go-agent/wrapper/ && \
-    mv -v /go-agent-25.1.0/wrapper/wrapper.jar /go-agent/wrapper/ && \
+    mv -v /go-agent-25.2.0/wrapper/wrapper-linux-$WRAPPERARCH* /go-agent/wrapper/ && \
+    mv -v /go-agent-25.2.0/wrapper/libwrapper-linux-$WRAPPERARCH* /go-agent/wrapper/ && \
+    mv -v /go-agent-25.2.0/wrapper/wrapper.jar /go-agent/wrapper/ && \
     chown -R ${UID}:0 /go-agent && chmod -R g=u /go-agent
-
+FROM frolvlad/alpine-glibc:alpine-3 AS multistageinput
 FROM docker.io/docker:dind
 ARG TARGETARCH
 
-LABEL gocd.version="25.1.0" \
+LABEL gocd.version="25.2.0" \
   description="GoCD agent based on docker.io/docker:dind" \
   maintainer="GoCD Team <go-cd-dev@googlegroups.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="25.1.0-20129" \
-  gocd.git.sha="5ca0c3de227fdbc4bf38480095d9385bbbc14b13"
+  gocd.full.version="25.2.0-20485" \
+  gocd.git.sha="2720963f2a829313e1f7922fc430682259e36a6d"
 
 ADD https://github.com/krallin/tini/releases/download/v0.19.0/tini-static-${TARGETARCH} /usr/local/sbin/tini
 
 # force encoding
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
+ENV LANG="C.UTF-8"
 ENV GO_JAVA_HOME="/gocd-jre"
 
 ARG UID=1000
 ARG GID=1000
-
+COPY --from=multistageinput /usr/glibc-compat /usr/glibc-compat
 RUN \
 # add mode and permissions for files we added above
   chmod 0755 /usr/local/sbin/tini && \
@@ -66,24 +67,15 @@ RUN \
   apk add --no-cache git openssh-client bash curl procps && \
   apk add --no-cache sudo && \
   # install glibc for the Tanuki Wrapper, and use by glibc-linked Adoptium JREs && \
-    apk add --no-cache tzdata --virtual .build-deps curl && \
-    GLIBC_VER="2.34-r0" && \
-    ALPINE_GLIBC_REPO="https://github.com/sgerrand/alpine-pkg-glibc/releases/download" && \
-    curl -LfsS https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub -o /etc/apk/keys/sgerrand.rsa.pub && \
-    SGERRAND_RSA_SHA256="823b54589c93b02497f1ba4dc622eaef9c813e6b0f0ebbb2f771e32adf9f4ef2" && \
-    echo "${SGERRAND_RSA_SHA256} */etc/apk/keys/sgerrand.rsa.pub" | sha256sum -c - && \
-    curl -LfsS ${ALPINE_GLIBC_REPO}/${GLIBC_VER}/glibc-${GLIBC_VER}.apk > /tmp/glibc-${GLIBC_VER}.apk && \
-    apk add --no-cache --force-overwrite /tmp/glibc-${GLIBC_VER}.apk && \
-    curl -LfsS ${ALPINE_GLIBC_REPO}/${GLIBC_VER}/glibc-bin-${GLIBC_VER}.apk > /tmp/glibc-bin-${GLIBC_VER}.apk && \
-    apk add --no-cache /tmp/glibc-bin-${GLIBC_VER}.apk && \
-    curl -Ls ${ALPINE_GLIBC_REPO}/${GLIBC_VER}/glibc-i18n-${GLIBC_VER}.apk > /tmp/glibc-i18n-${GLIBC_VER}.apk && \
-    apk add --no-cache /tmp/glibc-i18n-${GLIBC_VER}.apk && \
-    /usr/glibc-compat/bin/localedef --force --inputfile POSIX --charmap UTF-8 "$LANG" || true && \
-    echo "export LANG=$LANG" > /etc/profile.d/locale.sh && \
-    apk del --purge .build-deps glibc-i18n && \
-    rm -rf /tmp/*.apk /var/cache/apk/* && \
+    GLIBC_DIR=/usr/glibc-compat && \
+    GLIBC_LIB=$([ "$(arch)" = "aarch64" ] && echo ld-linux-aarch64.so.1 || echo ld-linux-x86-64.so.2) && \
+    ln -s ${GLIBC_DIR}/lib/${GLIBC_LIB} /lib/${GLIBC_LIB} && \
+    mkdir -p /lib64 && ln -s ${GLIBC_DIR}/lib/${GLIBC_LIB} /lib64/${GLIBC_LIB} && \
+    ln -s ${GLIBC_DIR}/etc/ld.so.cache /etc/ld.so.cache && \
+    echo "export LANG=C.UTF-8" > /etc/profile.d/locale.sh && \
+    ${GLIBC_DIR}/sbin/ldconfig && \
   # end installing glibc && \
-  curl --fail --location --silent --show-error "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.6%2B7/OpenJDK21U-jre_$(uname -m | sed -e s/86_//g)_linux_hotspot_21.0.6_7.tar.gz" --output /tmp/jre.tar.gz && \
+  curl --fail --location --silent --show-error "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.7%2B6/OpenJDK21U-jre_$(uname -m | sed -e s/86_//g)_linux_hotspot_21.0.7_6.tar.gz" --output /tmp/jre.tar.gz && \
   mkdir -p /gocd-jre && \
   tar -xf /tmp/jre.tar.gz -C /gocd-jre --strip 1 && \
   rm -rf /tmp/jre.tar.gz && \
